@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema Solar Interdimensional</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: #000;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        canvas {
+            display: block;
+        }
+        .info {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 14px;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+            z-index: 10;
+        }
+        .title {
+            position: absolute;
+            top: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 42px;
+            font-weight: bold;
+            color: rgba(255, 255, 255, 0.9);
+            letter-spacing: 12px;
+            text-shadow: 0 0 20px rgba(0, 255, 255, 0.8), 0 0 40px rgba(0, 200, 255, 0.5);
+            pointer-events: none;
+            z-index: 10;
+            background: linear-gradient(90deg, #00d4ff, #00ff88, #00d4ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .legend {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 12px;
+            text-align: right;
+            z-index: 10;
+        }
+        .conventions-panel {
+            position: absolute;
+            top: 90px;
+            left: 20px;
+            width: 320px;
+            max-height: calc(100vh - 140px);
+            background: rgba(0, 20, 40, 0.85);
+            border: 2px solid rgba(0, 200, 255, 0.4);
+            border-radius: 12px;
+            padding: 15px;
+            overflow-y: auto;
+            backdrop-filter: blur(10px);
+            z-index: 10;
+            box-shadow: 0 0 30px rgba(0, 200, 255, 0.3);
+        }
+        .conventions-panel::-webkit-scrollbar {
+            width: 8px;
+        }
+        .conventions-panel::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 4px;
+        }
+        .conventions-panel::-webkit-scrollbar-thumb {
+            background: rgba(0, 200, 255, 0.5);
+            border-radius: 4px;
+        }
+        .conventions-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #00d4ff;
+            margin-bottom: 15px;
+            text-align: center;
+            text-shadow: 0 0 10px rgba(0, 200, 255, 0.8);
+            letter-spacing: 2px;
+        }
+        .planet-item {
+            margin-bottom: 12px;
+            padding: 10px;
+            background: rgba(0, 50, 100, 0.3);
+            border-left: 3px solid;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            display: flex;
+            gap: 10px;
+        }
+        .planet-item:hover {
+            background: rgba(0, 80, 150, 0.4);
+            transform: translateX(5px);
+        }
+        .planet-icon {
+            flex-shrink: 0;
+            width: 60px;
+            height: 60px;
+            position: relative;
+        }
+        .planet-icon canvas {
+            width: 100%;
+            height: 100%;
+        }
+        .planet-info-content {
+            flex: 1;
+        }
+        .planet-number {
+            font-weight: bold;
+            font-size: 16px;
+            margin-bottom: 4px;
+        }
+        .planet-name {
+            font-weight: bold;
+            font-size: 14px;
+            margin-bottom: 3px;
+        }
+        .planet-description {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.4;
+        }
+        .planet-data {
+            margin-top: 6px;
+            padding: 6px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 4px;
+            font-size: 10px;
+            color: rgba(200, 220, 255, 0.9);
+        }
+        .planet-data-item {
+            margin: 2px 0;
+        }
+        .data-label {
+            color: rgba(0, 200, 255, 0.8);
+            font-weight: bold;
+        }
+        .toggle-panel {
+            position: absolute;
+            top: 90px;
+            left: 360px;
+            background: rgba(0, 100, 200, 0.7);
+            border: none;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            z-index: 10;
+            transition: all 0.3s ease;
+        }
+        .toggle-panel:hover {
+            background: rgba(0, 150, 255, 0.9);
+            transform: scale(1.05);
+        }
+        .panel-hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    <div class="title">SISTEMA SOLAR</div>
+    <div class="info">Portal Interdimensional - Sistema Solar</div>
+    <button class="toggle-panel" onclick="togglePanel()">☰ Convenciones</button>
+    
+    <div class="conventions-panel" id="conventionsPanel">
+        <div class="conventions-title">CONVENCIONES</div>
+        <div class="planet-item" style="border-color: #FDB813;">
+            <div class="planet-icon">
+                <canvas id="icon-sol"></canvas>
+            </div>
+            <div class="planet-info-content">
+                <div class="planet-number" style="color: #FDB813;">0. SOL</div>
+                <div class="planet-description">Estrella central del sistema solar. Compuesta principalmente de hidrógeno y helio, genera energía mediante fusión nuclear. Representa el 99.86% de la masa total del sistema.</div>
+                <div class="planet-data">
+                    <div class="planet-data-item"><span class="data-label">Diámetro:</span> 1,392,700 km</div>
+                    <div class="planet-data-item"><span class="data-label">Rotación:</span> 25-35 días terrestres</div>
+                    <div class="planet-data-item"><span class="data-label">Satélites:</span> 8 planetas</div>
+                    <div class="planet-data-item"><span class="data-label">Distancia:</span> Centro del sistema</div>
+                </div>
+            </div>
+        </div>
+        <div class="planet-item" style="border-color: #8C7853;">
+            <div class="planet-icon">
+                <canvas id="icon-mercurio"></canvas>
+            </div>
+            <div class="planet-info-content">
+                <div class="planet-number" style="color: #8C7853;">1. MERCURIO</div>
+                <div class="planet-description">El planeta más pequeño y cercano al Sol. Sin atmósfera significativa, presenta temperaturas extremas. Su superficie está llena de cráteres por impactos de asteroides.</div>
+                <div class="planet-data">
+                    <div class="planet-data-item"><span class="data-label">Diámetro:</span> 4,879 km</div>
+                    <div class="planet-data-item"><span class="data-label">Rotación:</span> 58.6 días terrestres</div>
+                    <div class="planet-data-item"><span class="data-label">Inclinación:</span> 0.1°</div>
+                    <div class="planet-data-item"><span class="data-label">Satélites:</span> 0</div>
+                    <div class="planet-data-item"><span class="data-label">Distancia al Sol:</span> 57.9 millones km</div>
+                </div>
+            </div>
+        </div>
+        <div class="planet-item" style="border-color: #FFC649;">
+            <div class="planet-icon">
+                <canvas id="icon-venus"></canvas>
+            </div>
+            <div class="planet-info-content">
+                <div class="planet-number" style="color: #FFC649;">2. VENUS</div>
+                <div class="planet-description">Planeta más caliente del sistema solar debido a su densa atmósfera de CO₂. Similar en tamaño a la Tierra, pero con condiciones extremas y lluvia ácida.</div>
+                <div class="planet-data">
+                    <div class="planet-data-item"><span class="data-label">Diámetro:</span> 12,104 km</div>
+                    <div class="planet-data-item"><span class="data-label">Rotación:</span> 243 días terrestres</div>
+                    <div class="planet-data-item"><span class="data-label">Inclinación:</span> 177°</div>
+                    <div class="planet-data-item"><span class="data-label">Satélites:</span> 0</div>
+                    <div class="planet-data-item"><span class="data-label">Distancia al Sol:</span> 108.2 millones km</div>
+                </div>
+            </div>
+        </div>
+        <div class="planet-item" style="border-color: #4A90E2;">
+            <div class="planet-icon">
+                <canvas id="icon-tierra"></canvas>
+            </div>
+            <div class="planet-info-content">
+                <div class="planet-number" style="color: #4A90E2;">3. TIERRA</div>
+                <div class="planet-description">Nuestro hogar. Único planeta conocido con vida. Posee agua líquida en su superficie, atmósfera respirable y un satélite natural: la Luna.</div>
+                <div class="planet-data">
+                    <div class="planet-data-item"><span class="data-label">Diámetro:</span> 12,742 km</div>
+                    <div class="planet-data-item"><span class="data-label">Rotación:</span> 24 horas (1 día)</div>
+                    <div class="planet-data-item"><span class="data-label">Inclinación:</span> 23°</div>
+                    <div class="planet-data-item"><span class="data-label">Satélites:</span> 1 (Luna)</div>
+                    <div class="planet-data-item"><span class="data-label">Distancia al Sol:</span> 149.6 millones km</div>
+                </div>
+            </div>
+        </div>
+        <div class="planet-item" style="border-color: #E27B58;">
+            <div class="planet-icon">
+                <canvas id="icon-marte"></canvas>
+            </div>
+            <div class="planet-info-content">
+                <div class="planet-number" style="color: #E27B58;">4. MARTE</div>
+                <div class="planet-description">El planeta rojo. Posee los volcanes más grandes del sistema solar y evidencia de agua en el pasado. Tiene dos pequeñas lunas: Fobos y Deimos.</div>
+                <div class="planet-data">
+                    <div class="planet-data-item"><span class="data-label">Diámetro:</span> 6,779 km</div>
+                    <div class="planet-data-item"><span class="data-label">Rotación:</span> 24.6 horas</div>
+                    <div class="planet-data-item"><span class="data-label">Inclinación:</span> 25°</div>
+                    <div class="planet-data-item"><span class="data-label">Satélites:</span> 2 (Fobos y Deimos)</div>
+                    <div class="planet-data-item"><span class="data-label">Distancia al Sol:</span> 227.9 millones km</div>
+                </div>
+            </div>
+        </div>
+        <div class="planet-item" style="border-color: #C88B3A;">
+            <div class="planet-icon">
+                <canvas id="icon-jupiter"></canvas>
+            </div>
+            <div class="planet-info-content">
+                <div class="planet-number" style="color: #C88B3A;">5. JÚPITER</div>
+                <div class="planet-description">El planeta más grande del sistema solar. Gigante gaseoso con una gran mancha roja (tormenta gigante). Posee 95 lunas conocidas, incluyendo Ío, Europa, Ganímedes y Calisto.</div>
+                <div class="planet-data">
+                    <div class="planet-data-item"><span class="data-label">Diámetro:</span> 139,820 km</div>
+                    <div class="planet-data-item"><span class="data-label">Rotación:</span> 9.9 horas</div>
+                    <div class="planet-data-item"><span class="data-label">Inclinación:</span> 3°</div>
+                    <div class="planet-data-item"><span class="data-label">Satélites:</span> 95 conocidas</div>
+                    <div class="planet-data-item"><span class="data-label">Distancia al Sol:</span> 778.5 millones km</div>
+                </div>
+            </div>
+        </div>
+        <div class="planet-item" style="border-color: #FAD5A5;">
+            <div class="planet-icon">
+                <canvas id="icon-saturno"></canvas>
+            </div>
+            <div class="planet-info-content">
+                <div class="planet-number" style="color: #FAD5A5;">6. SATURNO</div>
+                <div class="planet-description">Famoso por sus espectaculares anillos compuestos de hielo y roca. Segundo planeta más grande. Tiene 146 lunas, destacando Titán y Encélado.</div>
+                <div class="planet-data">
+                    <div class="planet-data-item"><span class="data-label">Diámetro:</span> 116,460 km</div>
+                    <div class="planet-data-item"><span class="data-label">Rotación:</span> 10.7 horas</div>
+                    <div class="planet-data-item"><span class="data-label">Inclinación:</span> 27°</div>
+                    <div class="planet-data-item"><span class="data-label">Satélites:</span> 146 conocidas</div>
+                    <div class="planet-data-item"><span class="data-label">Distancia al Sol:</span> 1,434 millones km</div>
+                </div>
+            </div>
+        </div>
+        <div class="planet-item" style="border-color: #4FD0E4;">
+            <div class="planet-icon">
+                <canvas id="icon-urano"></canvas>
+            </div>
+            <div class="planet-info-content">
+                <div class="planet-number" style="color: #4FD0E4;">7. URANO</div>
+                <div class="planet-description">Gigante de hielo con una inclinación axial extrema (rota "de lado"). Posee un color azul verdoso por el metano en su atmósfera. Tiene 28 lunas conocidas.</div>
+                <div class="planet-data">
+                    <div class="planet-data-item"><span class="data-label">Diámetro:</span> 50,724 km</div>
+                    <div class="planet-data-item"><span class="data-label">Rotación:</span> 17.2 horas</div>
+                    <div class="planet-data-item"><span class="data-label">Inclinación:</span> 98°</div>
+                    <div class="planet-data-item"><span class="data-label">Satélites:</span> 28 conocidas</div>
+                    <div class="planet-data-item"><span class="data-label">Distancia al Sol:</span> 2,871 millones km</div>
+                </div>
+            </div>
+        </div>
+        <div class="planet-item" style="border-color: #4166F5;">
+            <div class="planet-icon">
+                <canvas id="icon-neptuno"></canvas>
+            </div>
+            <div class="planet-info-content">
+                <div class="planet-number" style="color: #4166F5;">8. NEPTUNO</div>
+                <div class="planet-description">El planeta más alejado del Sol. Gigante de hielo con los vientos más fuertes del sistema solar. Su luna principal, Tritón, tiene órbita retrógrada.</div>
+                <div class="planet-data">
+                    <div class="planet-data-item"><span class="data-label">Diámetro:</span> 49,244 km</div>
+                    <div class="planet-data-item"><span class="data-label">Rotación:</span> 16.1 horas</div>
+                    <div class="planet-data-item"><span class="data-label">Inclinación:</span> 29°</div>
+                    <div class="planet-data-item"><span class="data-label">Satélites:</span> 16 conocidas</div>
+                    <div class="planet-data-item"><span class="data-label">Distancia al Sol:</span> 4,495 millones km</div>
+                </div>
+            </div>
+        </div>
+        <div class="planet-item" style="border-color: #B8A890;">
+            <div class="planet-icon">
+                <canvas id="icon-pluton"></canvas>
+            </div>
+            <div class="planet-info-content">
+                <div class="planet-number" style="color: #B8A890;">9. PLUTÓN</div>
+                <div class="planet-description">Planeta enano del cinturón de Kuiper. Reclasificado en 2006. Posee 5 lunas, siendo Caronte la más grande. Su órbita es muy excéntrica.</div>
+                <div class="planet-data">
+                    <div class="planet-data-item"><span class="data-label">Diámetro:</span> 2,377 km</div>
+                    <div class="planet-data-item"><span class="data-label">Rotación:</span> 6.4 días terrestres</div>
+                    <div class="planet-data-item"><span class="data-label">Inclinación:</span> 122°</div>
+                    <div class="planet-data-item"><span class="data-label">Satélites:</span> 5 (Caronte, Estigia, Nix, Cerbero, Hidra)</div>
+                    <div class="planet-data-item"><span class="data-label">Distancia al Sol:</span> 5,906 millones km</div>
+                </div>
+            </div>
+        </div>
+        <div class="planet-item" style="border-color: #6A5ACD;">
+            <div class="planet-icon">
+                <canvas id="icon-oort"></canvas>
+            </div>
+            <div class="planet-info-content">
+                <div class="planet-number" style="color: #6A5ACD;">10. NUBE DE OORT</div>
+                <div class="planet-description">Región esférica teórica en los confines del sistema solar. Compuesta por billones de cometas congelados. Se extiende hasta casi 2 años luz del Sol.</div>
+                <div class="planet-data">
+                    <div class="planet-data-item"><span class="data-label">Diámetro:</span> ~200,000 UA</div>
+                    <div class="planet-data-item"><span class="data-label">Rotación:</span> No aplica</div>
+                    <div class="planet-data-item"><span class="data-label">Objetos:</span> Billones de cometas</div>
+                    <div class="planet-data-item"><span class="data-label">Distancia al Sol:</span> 2,000 - 200,000 UA</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="legend">
+        Haz clic para cambiar de dimensión<br>
+        Mueve el mouse para interactuar<br>
+        Usa la rueda para zoom
+    </div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        function updateCanvasSize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        
+        updateCanvasSize();
+
+        const particles = [];
+        const particleCount = 200;
+        let time = 0;
+        let dimensionMode = 0;
+        let zoomLevel = 1;
+        let offsetX = 0;
+        let offsetY = 0;
+
+        function togglePanel() {
+            const panel = document.getElementById('conventionsPanel');
+            panel.classList.toggle('panel-hidden');
+        }
+
+        const celestialBodies = [
+            { name: 'Sol', distance: 0, size: 30, color: '#FDB813', speed: 0, glow: 60 },
+            { name: 'Mercurio', distance: 70, size: 4, color: '#8C7853', speed: 0.04, glow: 8 },
+            { name: 'Venus', distance: 100, size: 7, color: '#FFC649', speed: 0.03, glow: 12 },
+            { name: 'Tierra', distance: 140, size: 8, color: '#4A90E2', speed: 0.02, glow: 14 },
+            { name: 'Luna', distance: 20, size: 3, color: '#C0C0C0', speed: 0.1, orbitAround: 'Tierra', glow: 6 },
+            { name: 'Marte', distance: 180, size: 6, color: '#E27B58', speed: 0.018, glow: 10 },
+            { name: 'Fobos', distance: 12, size: 1.5, color: '#8C7853', speed: 0.15, orbitAround: 'Marte', glow: 3 },
+            { name: 'Deimos', distance: 18, size: 1, color: '#A89080', speed: 0.12, orbitAround: 'Marte', glow: 2 },
+            { name: 'Júpiter', distance: 250, size: 18, color: '#C88B3A', speed: 0.012, glow: 25 },
+            { name: 'Ío', distance: 28, size: 2.5, color: '#F4D03F', speed: 0.08, orbitAround: 'Júpiter', glow: 5 },
+            { name: 'Europa', distance: 35, size: 2.3, color: '#E8F4F8', speed: 0.06, orbitAround: 'Júpiter', glow: 4 },
+            { name: 'Ganimedes', distance: 42, size: 3, color: '#B8A892', speed: 0.05, orbitAround: 'Júpiter', glow: 5 },
+            { name: 'Calisto', distance: 50, size: 2.8, color: '#5C4F42', speed: 0.04, orbitAround: 'Júpiter', glow: 4 },
+            { name: 'Saturno', distance: 310, size: 16, color: '#FAD5A5', speed: 0.009, glow: 22, rings: true },
+            { name: 'Titán', distance: 30, size: 3.2, color: '#FFA500', speed: 0.07, orbitAround: 'Saturno', glow: 5 },
+            { name: 'Encélado', distance: 24, size: 1.8, color: '#FFFFFF', speed: 0.09, orbitAround: 'Saturno', glow: 3 },
+            { name: 'Rea', distance: 38, size: 2, color: '#C0C0C0', speed: 0.06, orbitAround: 'Saturno', glow: 3 },
+            { name: 'Urano', distance: 370, size: 11, color: '#4FD0E4', speed: 0.006, glow: 18 },
+            { name: 'Titania', distance: 22, size: 2, color: '#B8E6F0', speed: 0.08, orbitAround: 'Urano', glow: 3 },
+            { name: 'Oberón', distance: 28, size: 1.9, color: '#8CC4D6', speed: 0.07, orbitAround: 'Urano', glow: 3 },
+            { name: 'Neptuno', distance: 420, size: 10, color: '#4166F5', speed: 0.005, glow: 16 },
+            { name: 'Tritón', distance: 22, size: 2.5, color: '#7BA3E8', speed: -0.09, orbitAround: 'Neptuno', glow: 4 },
+            { name: 'Plutón', distance: 470, size: 4.5, color: '#B8A890', speed: 0.004, glow: 8 },
+            { name: 'Caronte', distance: 12, size: 2, color: '#9A8A7A', speed: 0.1, orbitAround: 'Plutón', glow: 4 }
+        ];
+
+        function getCenterX() {
+            return canvas.width / 2 + offsetX;
+        }
+        
+        function getCenterY() {
+            return canvas.height / 2 + offsetY;
+        }
+
+        class Particle {
+            constructor() {
+                this.reset();
+            }
+
+            reset() {
+                this.angle = Math.random() * Math.PI * 2;
+                this.distance = 0;
+                this.speed = Math.random() * 2 + 1;
+                this.size = Math.random() * 3 + 1;
+                this.hue = Math.random() * 60 + 160;
+                this.opacity = 1;
+            }
+
+            update() {
+                this.distance += this.speed;
+                const warp = Math.sin(time * 0.001 + this.angle) * 50;
+                this.x = getCenterX() + Math.cos(this.angle + time * 0.001) * (this.distance + warp);
+                this.y = getCenterY() + Math.sin(this.angle + time * 0.001) * (this.distance + warp);
+                this.opacity = 1 - (this.distance / 500);
+                
+                if (this.distance > 500 || this.opacity <= 0) {
+                    this.reset();
+                }
+            }
+
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = this.opacity * 0.6;
+                
+                const gradient = ctx.createRadialGradient(
+                    this.x, this.y, 0,
+                    this.x, this.y, this.size * 3
+                );
+                gradient.addColorStop(0, `hsla(${this.hue}, 100%, 70%, 1)`);
+                gradient.addColorStop(1, `hsla(${this.hue}, 100%, 50%, 0)`);
+                
+                ctx.fillStyle = gradient;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size * 3, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.fillStyle = `hsl(${this.hue}, 100%, 90%)`;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.restore();
+            }
+        }
+
+        for (let i = 0; i < particleCount; i++) {
+            particles.push(new Particle());
+        }
+
+        function drawVortex() {
+            const centerX = getCenterX();
+            const centerY = getCenterY();
+            
+            for (let i = 5; i > 0; i--) {
+                const radius = 50 + i * 30 + Math.sin(time * 0.002) * 20;
+                const gradient = ctx.createRadialGradient(
+                    centerX, centerY, radius - 20,
+                    centerX, centerY, radius
+                );
+                
+                const hue = (180 + i * 20 + time * 0.1) % 360;
+                gradient.addColorStop(0, `hsla(${hue}, 100%, 50%, 0)`);
+                gradient.addColorStop(1, `hsla(${hue}, 100%, 60%, ${0.05 + i * 0.02})`);
+                
+                ctx.fillStyle = gradient;
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function drawDistortionRings() {
+            const centerX = getCenterX();
+            const centerY = getCenterY();
+            
+            ctx.strokeStyle = 'rgba(0, 255, 255, 0.1)';
+            ctx.lineWidth = 1;
+            
+            for (let i = 0; i < 6; i++) {
+                const phase = time * 0.003 + i * 0.5;
+                const radius = 100 + i * 70 + Math.sin(phase) * 30;
+                
+                ctx.beginPath();
+                for (let angle = 0; angle < Math.PI * 2; angle += 0.1) {
+                    const distortion = Math.sin(angle * 3 + phase) * 10;
+                    const x = centerX + Math.cos(angle) * (radius + distortion);
+                    const y = centerY + Math.sin(angle) * (radius + distortion);
+                    
+                    if (angle === 0) {
+                        ctx.moveTo(x, y);
+                    } else {
+                        ctx.lineTo(x, y);
+                    }
+                }
+                ctx.closePath();
+                ctx.stroke();
+            }
+        }
+
+        function drawOortCloud() {
+            const centerX = getCenterX();
+            const centerY = getCenterY();
+            
+            ctx.strokeStyle = 'rgba(106, 90, 205, 0.15)';
+            ctx.lineWidth = 2;
+            
+            for (let i = 0; i < 3; i++) {
+                const radius = 550 + i * 30;
+                ctx.beginPath();
+                ctx.setLineDash([10, 20]);
+                ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+            
+            ctx.setLineDash([]);
+            
+            for (let i = 0; i < 30; i++) {
+                const angle = (Math.PI * 2 / 30) * i + time * 0.0001;
+                const radius = 550 + Math.random() * 80;
+                const x = centerX + Math.cos(angle) * radius;
+                const y = centerY + Math.sin(angle) * radius;
+                
+                ctx.fillStyle = 'rgba(150, 130, 220, 0.4)';
+                ctx.beginPath();
+                ctx.arc(x, y, 1 + Math.random(), 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function drawCelestialBody(body) {
+            const centerX = getCenterX();
+            const centerY = getCenterY();
+            let x, y;
+            
+            if (body.orbitAround) {
+                const parent = celestialBodies.find(b => b.name === body.orbitAround);
+                let parentX, parentY;
+                
+                if (parent.orbitAround) {
+                    const grandParent = celestialBodies.find(b => b.name === parent.orbitAround);
+                    const grandParentAngle = time * grandParent.speed;
+                    const grandParentX = centerX + Math.cos(grandParentAngle) * grandParent.distance * zoomLevel;
+                    const grandParentY = centerY + Math.sin(grandParentAngle) * grandParent.distance * zoomLevel;
+                    
+                    const parentAngle = time * parent.speed;
+                    parentX = grandParentX + Math.cos(parentAngle) * parent.distance * zoomLevel;
+                    parentY = grandParentY + Math.sin(parentAngle) * parent.distance * zoomLevel;
+                } else {
+                    const parentAngle = time * parent.speed;
+                    parentX = centerX + Math.cos(parentAngle) * parent.distance * zoomLevel;
+                    parentY = centerY + Math.sin(parentAngle) * parent.distance * zoomLevel;
+                }
+                
+                const moonAngle = time * body.speed;
+                x = parentX + Math.cos(moonAngle) * body.distance * zoomLevel;
+                y = parentY + Math.sin(moonAngle) * body.distance * zoomLevel;
+            } else {
+                const angle = time * body.speed;
+                x = centerX + Math.cos(angle) * body.distance * zoomLevel;
+                y = centerY + Math.sin(angle) * body.distance * zoomLevel;
+            }
+
+            if (body.distance > 0 && !body.orbitAround) {
+                ctx.strokeStyle = `rgba(255, 255, 255, 0.1)`;
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, body.distance * zoomLevel, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+
+            const scaledSize = body.size * Math.max(0.5, zoomLevel);
+            const scaledGlow = body.glow * Math.max(0.5, zoomLevel);
+
+            const glowGradient = ctx.createRadialGradient(x, y, 0, x, y, scaledGlow);
+            glowGradient.addColorStop(0, body.color + 'AA');
+            glowGradient.addColorStop(0.5, body.color + '33');
+            glowGradient.addColorStop(1, body.color + '00');
+            ctx.fillStyle = glowGradient;
+            ctx.beginPath();
+            ctx.arc(x, y, scaledGlow, 0, Math.PI * 2);
+            ctx.fill();
+
+            if (body.rings) {
+                ctx.strokeStyle = body.color + '80';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.ellipse(x, y, scaledSize + 8, scaledSize + 2, 0, 0, Math.PI * 2);
+                ctx.stroke();
+                
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.ellipse(x, y, scaledSize + 12, scaledSize + 3, 0, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+
+            const bodyGradient = ctx.createRadialGradient(
+                x - scaledSize * 0.3, y - scaledSize * 0.3, 0,
+                x, y, scaledSize
+            );
+            bodyGradient.addColorStop(0, lightenColor(body.color, 40));
+            bodyGradient.addColorStop(1, body.color);
+            
+            ctx.fillStyle = bodyGradient;
+            ctx.beginPath();
+            ctx.arc(x, y, scaledSize, 0, Math.PI * 2);
+            ctx.fill();
+
+            if (body.name === 'Sol') {
+                ctx.strokeStyle = '#FFE5B4';
+                ctx.lineWidth = 2;
+                for (let i = 0; i < 8; i++) {
+                    const rayAngle = (Math.PI * 2 / 8) * i + time * 0.01;
+                    const rayLength = scaledSize + 15 + Math.sin(time * 0.02 + i) * 5;
+                    ctx.beginPath();
+                    ctx.moveTo(x + Math.cos(rayAngle) * scaledSize, y + Math.sin(rayAngle) * scaledSize);
+                    ctx.lineTo(x + Math.cos(rayAngle) * rayLength, y + Math.sin(rayAngle) * rayLength);
+                    ctx.stroke();
+                }
+            }
+
+            if (body.name === 'Tierra' && scaledSize > 4) {
+                ctx.fillStyle = '#2E7D32';
+                ctx.beginPath();
+                ctx.arc(x + 2, y, scaledSize * 0.4, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.fillStyle = '#FFFFFF';
+                ctx.beginPath();
+                ctx.arc(x, y - scaledSize * 0.6, scaledSize * 0.3, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            if (zoomLevel > 0.8 && scaledSize > 3) {
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+                ctx.font = `${Math.max(10, scaledSize)}px Arial`;
+                ctx.textAlign = 'center';
+                ctx.fillText(body.name, x, y + scaledSize + 15);
+            }
+        }
+
+        function lightenColor(color, percent) {
+            const num = parseInt(color.replace("#", ""), 16);
+            const r = Math.min(255, ((num >> 16) & 255) + percent);
+            const g = Math.min(255, ((num >> 8) & 255) + percent);
+            const b = Math.min(255, (num & 255) + percent);
+            return `rgb(${r}, ${g}, ${b})`;
+        }
+
+        function animate() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            drawOortCloud();
+            
+            if (dimensionMode === 0 || dimensionMode === 2) {
+                drawDistortionRings();
+                drawVortex();
+            }
+            
+            if (dimensionMode === 0 || dimensionMode === 2) {
+                particles.forEach(particle => {
+                    particle.update();
+                    particle.draw();
+                });
+            }
+            
+            celestialBodies.forEach(body => {
+                drawCelestialBody(body);
+            });
+            
+            time++;
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+
+        window.addEventListener('resize', updateCanvasSize);
+
+        canvas.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            const delta = e.deltaY > 0 ? 0.9 : 1.1;
+            zoomLevel = Math.max(0.3, Math.min(2, zoomLevel * delta));
+        });
+
+        canvas.addEventListener('mousemove', (e) => {
+            if (dimensionMode !== 1) {
+                const rect = canvas.getBoundingClientRect();
+                const mouseX = e.clientX - rect.left;
+                const mouseY = e.clientY - rect.top;
+                const centerX = getCenterX();
+                const centerY = getCenterY();
+                
+                if (Math.random() > 0.8) {
+                    const p = new Particle();
+                    const dx = mouseX - centerX;
+                    const dy = mouseY - centerY;
+                    p.angle = Math.atan2(dy, dx) + (Math.random() - 0.5) * 0.5;
+                    particles.push(p);
+                    
+                    if (particles.length > particleCount + 30) {
+                        particles.shift();
+                    }
+                }
+            }
+        });
+
+        canvas.addEventListener('click', () => {
+            dimensionMode = (dimensionMode + 1) % 3;
+            const modes = ['Portal + Sistema Solar', 'Solo Sistema Solar', 'Dimensión Completa'];
+            document.querySelector('.info').textContent = `Modo: ${modes[dimensionMode]}`;
+        });
+    </script>
+</body>
+</html>
