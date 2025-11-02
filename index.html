@@ -16,22 +16,22 @@
         }
         .info {
             position: absolute;
-            top: 20px;
-            left: 20px;
+            top: 10px;
+            left: 10px;
             color: rgba(255, 255, 255, 0.7);
-            font-size: 14px;
+            font-size: 11px;
             text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
             z-index: 10;
         }
         .title {
             position: absolute;
-            top: 30px;
+            top: 15px;
             left: 50%;
             transform: translateX(-50%);
-            font-size: 42px;
+            font-size: 20px;
             font-weight: bold;
             color: rgba(255, 255, 255, 0.9);
-            letter-spacing: 12px;
+            letter-spacing: 4px;
             text-shadow: 0 0 20px rgba(0, 255, 255, 0.8), 0 0 40px rgba(0, 200, 255, 0.5);
             pointer-events: none;
             z-index: 10;
@@ -39,6 +39,19 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+        }
+        
+        @media (min-width: 768px) {
+            .info {
+                top: 20px;
+                left: 20px;
+                font-size: 14px;
+            }
+            .title {
+                top: 30px;
+                font-size: 42px;
+                letter-spacing: 12px;
+            }
         }
         .legend {
             position: absolute;
@@ -733,3 +746,4 @@
     </script>
 </body>
 </html>
+
