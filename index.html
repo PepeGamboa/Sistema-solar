@@ -5,33 +5,46 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistema Solar Interdimensional</title>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
         body {
             margin: 0;
             overflow: hidden;
             background: #000;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            touch-action: none;
         }
+        
         canvas {
             display: block;
+            width: 100vw;
+            height: 100vh;
         }
+        
         .info {
             position: absolute;
-            top: 10px;
-            left: 10px;
+            top: 8px;
+            left: 8px;
             color: rgba(255, 255, 255, 0.7);
-            font-size: 11px;
+            font-size: 10px;
             text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
             z-index: 10;
+            pointer-events: none;
         }
+        
         .title {
             position: absolute;
-            top: 15px;
+            top: 8px;
             left: 50%;
             transform: translateX(-50%);
-            font-size: 20px;
+            font-size: 16px;
             font-weight: bold;
             color: rgba(255, 255, 255, 0.9);
-            letter-spacing: 4px;
+            letter-spacing: 2px;
             text-shadow: 0 0 20px rgba(0, 255, 255, 0.8), 0 0 40px rgba(0, 200, 255, 0.5);
             pointer-events: none;
             z-index: 10;
@@ -39,6 +52,7 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+            white-space: nowrap;
         }
         
         @media (min-width: 768px) {
@@ -53,127 +67,267 @@
                 letter-spacing: 12px;
             }
         }
+        
         .legend {
             position: absolute;
-            bottom: 20px;
-            right: 20px;
+            bottom: 10px;
+            right: 10px;
             color: rgba(255, 255, 255, 0.6);
-            font-size: 12px;
+            font-size: 9px;
             text-align: right;
             z-index: 10;
+            pointer-events: none;
         }
+        
+        @media (min-width: 768px) {
+            .legend {
+                bottom: 20px;
+                right: 20px;
+                font-size: 12px;
+            }
+        }
+        
         .conventions-panel {
             position: absolute;
-            top: 90px;
-            left: 20px;
-            width: 320px;
-            max-height: calc(100vh - 140px);
-            background: rgba(0, 20, 40, 0.85);
+            top: 50px;
+            left: -100%;
+            width: 90vw;
+            max-width: 320px;
+            max-height: calc(100vh - 80px);
+            background: rgba(0, 20, 40, 0.95);
             border: 2px solid rgba(0, 200, 255, 0.4);
             border-radius: 12px;
-            padding: 15px;
+            padding: 12px;
             overflow-y: auto;
             backdrop-filter: blur(10px);
             z-index: 10;
             box-shadow: 0 0 30px rgba(0, 200, 255, 0.3);
+            transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
+        
+        @media (min-width: 768px) {
+            .conventions-panel {
+                top: 90px;
+                left: -340px;
+                padding: 15px;
+                max-height: calc(100vh - 140px);
+            }
+        }
+        
+        .conventions-panel.active {
+            left: 10px;
+        }
+        
+        @media (min-width: 768px) {
+            .conventions-panel.active {
+                left: 20px;
+            }
+        }
+        
         .conventions-panel::-webkit-scrollbar {
-            width: 8px;
+            width: 6px;
         }
+        
         .conventions-panel::-webkit-scrollbar-track {
             background: rgba(0, 0, 0, 0.3);
             border-radius: 4px;
         }
+        
         .conventions-panel::-webkit-scrollbar-thumb {
             background: rgba(0, 200, 255, 0.5);
             border-radius: 4px;
         }
+        
         .conventions-title {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: bold;
             color: #00d4ff;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
             text-align: center;
             text-shadow: 0 0 10px rgba(0, 200, 255, 0.8);
             letter-spacing: 2px;
         }
+        
+        @media (min-width: 768px) {
+            .conventions-title {
+                font-size: 18px;
+                margin-bottom: 15px;
+            }
+        }
+        
         .planet-item {
-            margin-bottom: 12px;
-            padding: 10px;
+            margin-bottom: 10px;
+            padding: 8px;
             background: rgba(0, 50, 100, 0.3);
             border-left: 3px solid;
             border-radius: 6px;
             transition: all 0.3s ease;
             display: flex;
-            gap: 10px;
+            gap: 8px;
         }
+        
+        @media (min-width: 768px) {
+            .planet-item {
+                margin-bottom: 12px;
+                padding: 10px;
+                gap: 10px;
+            }
+        }
+        
         .planet-item:hover {
             background: rgba(0, 80, 150, 0.4);
             transform: translateX(5px);
         }
+        
         .planet-icon {
             flex-shrink: 0;
-            width: 60px;
-            height: 60px;
+            width: 50px;
+            height: 50px;
             position: relative;
         }
+        
+        @media (min-width: 768px) {
+            .planet-icon {
+                width: 60px;
+                height: 60px;
+            }
+        }
+        
         .planet-icon canvas {
             width: 100%;
             height: 100%;
         }
+        
         .planet-info-content {
             flex: 1;
+            min-width: 0;
         }
+        
         .planet-number {
-            font-weight: bold;
-            font-size: 16px;
-            margin-bottom: 4px;
-        }
-        .planet-name {
             font-weight: bold;
             font-size: 14px;
             margin-bottom: 3px;
         }
+        
+        @media (min-width: 768px) {
+            .planet-number {
+                font-size: 16px;
+                margin-bottom: 4px;
+            }
+        }
+        
+        .planet-name {
+            font-weight: bold;
+            font-size: 12px;
+            margin-bottom: 2px;
+        }
+        
+        @media (min-width: 768px) {
+            .planet-name {
+                font-size: 14px;
+                margin-bottom: 3px;
+            }
+        }
+        
         .planet-description {
-            font-size: 11px;
+            font-size: 10px;
             color: rgba(255, 255, 255, 0.8);
             line-height: 1.4;
         }
+        
+        @media (min-width: 768px) {
+            .planet-description {
+                font-size: 11px;
+            }
+        }
+        
         .planet-data {
-            margin-top: 6px;
-            padding: 6px;
+            margin-top: 5px;
+            padding: 5px;
             background: rgba(0, 0, 0, 0.3);
             border-radius: 4px;
-            font-size: 10px;
+            font-size: 9px;
             color: rgba(200, 220, 255, 0.9);
         }
+        
+        @media (min-width: 768px) {
+            .planet-data {
+                margin-top: 6px;
+                padding: 6px;
+                font-size: 10px;
+            }
+        }
+        
         .planet-data-item {
             margin: 2px 0;
         }
+        
         .data-label {
             color: rgba(0, 200, 255, 0.8);
             font-weight: bold;
         }
+        
         .toggle-panel {
             position: absolute;
-            top: 90px;
-            left: 360px;
-            background: rgba(0, 100, 200, 0.7);
+            top: 50px;
+            left: 10px;
+            background: rgba(0, 100, 200, 0.8);
             border: none;
             color: white;
-            padding: 8px 12px;
-            border-radius: 6px;
+            padding: 10px 14px;
+            border-radius: 8px;
             cursor: pointer;
-            font-size: 12px;
-            z-index: 10;
+            font-size: 16px;
+            z-index: 11;
             transition: all 0.3s ease;
+            box-shadow: 0 2px 10px rgba(0, 200, 255, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
+        
+        @media (min-width: 768px) {
+            .toggle-panel {
+                top: 90px;
+                left: 20px;
+                padding: 8px 12px;
+                font-size: 12px;
+            }
+        }
+        
         .toggle-panel:hover {
             background: rgba(0, 150, 255, 0.9);
             transform: scale(1.05);
         }
-        .panel-hidden {
+        
+        .toggle-panel:active {
+            transform: scale(0.95);
+        }
+        
+        .toggle-icon {
+            font-size: 20px;
+            transition: transform 0.3s ease;
+        }
+        
+        @media (min-width: 768px) {
+            .toggle-icon {
+                font-size: 16px;
+            }
+        }
+        
+        .toggle-panel.active .toggle-icon {
+            transform: rotate(90deg);
+        }
+        
+        .toggle-text {
+            font-size: 11px;
             display: none;
+        }
+        
+        @media (min-width: 768px) {
+            .toggle-text {
+                display: inline;
+            }
         }
     </style>
 </head>
@@ -181,7 +335,10 @@
     <canvas id="canvas"></canvas>
     <div class="title">SISTEMA SOLAR</div>
     <div class="info">Portal Interdimensional - Sistema Solar</div>
-    <button class="toggle-panel" onclick="togglePanel()">☰ Convenciones</button>
+    <button class="toggle-panel" id="toggleBtn" onclick="togglePanel()">
+        <span class="toggle-icon">☰</span>
+        <span class="toggle-text">Convenciones</span>
+    </button>
     
     <div class="conventions-panel" id="conventionsPanel">
         <div class="conventions-title">CONVENCIONES</div>
@@ -359,12 +516,76 @@
                 </div>
             </div>
         </div>
+        <div class="planet-item" style="border-color: #87CEEB;">
+            <div class="planet-icon">
+                <canvas id="icon-halley"></canvas>
+            </div>
+            <div class="planet-info-content">
+                <div class="planet-number" style="color: #87CEEB;">11. COMETA HALLEY</div>
+                <div class="planet-description">El cometa más famoso, visible desde la Tierra cada 75-76 años. Su última aparición fue en 1986 y volverá en 2061. Órbita retrógrada con inclinación de 162°.</div>
+                <div class="planet-data">
+                    <div class="planet-data-item"><span class="data-label">Núcleo:</span> 15 × 8 km</div>
+                    <div class="planet-data-item"><span class="data-label">Período orbital:</span> 75-76 años</div>
+                    <div class="planet-data-item"><span class="data-label">Excentricidad:</span> 0.967</div>
+                    <div class="planet-data-item"><span class="data-label">Inclinación:</span> 162° (retrógrado)</div>
+                    <div class="planet-data-item"><span class="data-label">Origen:</span> Cinturón de Kuiper</div>
+                </div>
+            </div>
+        </div>
+        <div class="planet-item" style="border-color: #B0E0E6;">
+            <div class="planet-icon">
+                <canvas id="icon-hale-bopp"></canvas>
+            </div>
+            <div class="planet-info-content">
+                <div class="planet-number" style="color: #B0E0E6;">12. COMETA HALE-BOPP</div>
+                <div class="planet-description">Uno de los cometas más brillantes del siglo XX. Visible durante 18 meses en 1996-1997. Viene del disco disperso más allá de Neptuno con una inclinación de 89°.</div>
+                <div class="planet-data">
+                    <div class="planet-data-item"><span class="data-label">Núcleo:</span> ~60 km</div>
+                    <div class="planet-data-item"><span class="data-label">Período orbital:</span> ~2,533 años</div>
+                    <div class="planet-data-item"><span class="data-label">Excentricidad:</span> 0.995</div>
+                    <div class="planet-data-item"><span class="data-label">Inclinación:</span> 89° (casi perpendicular)</div>
+                    <div class="planet-data-item"><span class="data-label">Origen:</span> Nube de Oort interior</div>
+                </div>
+            </div>
+        </div>
+        <div class="planet-item" style="border-color: #ADD8E6;">
+            <div class="planet-icon">
+                <canvas id="icon-hyakutake"></canvas>
+            </div>
+            <div class="planet-info-content">
+                <div class="planet-number" style="color: #ADD8E6;">13. COMETA HYAKUTAKE</div>
+                <div class="planet-description">Descubierto en 1996. Pasó muy cerca de la Tierra con una cola de más de 500 millones de km. Proviene de la Nube de Oort con órbita muy inclinada hacia el sur.</div>
+                <div class="planet-data">
+                    <div class="planet-data-item"><span class="data-label">Núcleo:</span> ~4.2 km</div>
+                    <div class="planet-data-item"><span class="data-label">Período orbital:</span> ~70,000 años</div>
+                    <div class="planet-data-item"><span class="data-label">Excentricidad:</span> 0.9998</div>
+                    <div class="planet-data-item"><span class="data-label">Inclinación:</span> 124° (sur del plano)</div>
+                    <div class="planet-data-item"><span class="data-label">Origen:</span> Nube de Oort exterior</div>
+                </div>
+            </div>
+        </div>
+        <div class="planet-item" style="border-color: #AFEEEE;">
+            <div class="planet-icon">
+                <canvas id="icon-neowise"></canvas>
+            </div>
+            <div class="planet-info-content">
+                <div class="planet-number" style="color: #AFEEEE;">14. COMETA NEOWISE</div>
+                <div class="planet-description">Descubierto en 2020 por el telescopio NEOWISE. Visible a simple vista durante julio de 2020. Tiene una órbita muy inclinada que cruza el plano del sistema solar.</div>
+                <div class="planet-data">
+                    <div class="planet-data-item"><span class="data-label">Núcleo:</span> ~5 km</div>
+                    <div class="planet-data-item"><span class="data-label">Período orbital:</span> ~6,800 años</div>
+                    <div class="planet-data-item"><span class="data-label">Excentricidad:</span> 0.9992</div>
+                    <div class="planet-data-item"><span class="data-label">Inclinación:</span> 129° (muy inclinado)</div>
+                    <div class="planet-data-item"><span class="data-label">Origen:</span> Nube de Oort</div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="legend">
-        Haz clic para cambiar de dimensión<br>
-        Mueve el mouse para interactuar<br>
-        Usa la rueda para zoom
+        Haz clic en el Sol para fotones<br>
+        Toca para cambiar de dimensión<br>
+        Pellizca para zoom
     </div>
 
     <script>
@@ -385,10 +606,13 @@
         let zoomLevel = 1;
         let offsetX = 0;
         let offsetY = 0;
+        let photonsActive = false;
 
         function togglePanel() {
             const panel = document.getElementById('conventionsPanel');
-            panel.classList.toggle('panel-hidden');
+            const btn = document.getElementById('toggleBtn');
+            panel.classList.toggle('active');
+            btn.classList.toggle('active');
         }
 
         const celestialBodies = [
@@ -415,7 +639,20 @@
             { name: 'Neptuno', distance: 420, size: 10, color: '#4166F5', speed: 0.005, glow: 16 },
             { name: 'Tritón', distance: 22, size: 2.5, color: '#7BA3E8', speed: -0.09, orbitAround: 'Neptuno', glow: 4 },
             { name: 'Plutón', distance: 470, size: 4.5, color: '#B8A890', speed: 0.004, glow: 8 },
-            { name: 'Caronte', distance: 12, size: 2, color: '#9A8A7A', speed: 0.1, orbitAround: 'Plutón', glow: 4 }
+            { name: 'Caronte', distance: 12, size: 2, color: '#9A8A7A', speed: 0.1, orbitAround: 'Plutón', glow: 4 },
+            
+            // Cometas famosos con órbitas extremadamente elípticas desde diferentes direcciones
+            { name: 'Halley', distance: 750, size: 3, color: '#87CEEB', speed: 0.003, glow: 10, isComet: true, 
+              orbitOffset: Math.PI * 0.3, orbitEccentricity: 0.967, perihelion: 88, orbitRotation: 162, orbitInclination: 0.3 },
+            
+            { name: 'Hale-Bopp', distance: 900, size: 3.5, color: '#B0E0E6', speed: 0.0015, glow: 12, isComet: true, 
+              orbitOffset: Math.PI * 0.7, orbitEccentricity: 0.995, perihelion: 140, orbitRotation: 282, orbitInclination: 0.5 },
+            
+            { name: 'Hyakutake', distance: 1000, size: 2.8, color: '#ADD8E6', speed: 0.0012, glow: 9, isComet: true, 
+              orbitOffset: Math.PI * 1.2, orbitEccentricity: 0.9998, perihelion: 35, orbitRotation: 130, orbitInclination: -0.4 },
+            
+            { name: 'NEOWISE', distance: 850, size: 3, color: '#AFEEEE', speed: 0.002, glow: 10, isComet: true, 
+              orbitOffset: Math.PI * 1.8, orbitEccentricity: 0.9992, perihelion: 50, orbitRotation: 37, orbitInclination: 0.6 }
         ];
 
         function getCenterX() {
@@ -589,21 +826,215 @@
                 x = parentX + Math.cos(moonAngle) * body.distance * zoomLevel;
                 y = parentY + Math.sin(moonAngle) * body.distance * zoomLevel;
             } else {
-                const angle = time * body.speed;
-                x = centerX + Math.cos(angle) * body.distance * zoomLevel;
-                y = centerY + Math.sin(angle) * body.distance * zoomLevel;
+                const angle = time * body.speed + (body.orbitOffset || 0);
+                
+                // Para cometas, usar órbita elíptica muy alargada con inclinación y rotación
+                if (body.isComet) {
+                    const a = body.distance * zoomLevel; // semi-eje mayor (afelio - muy lejos)
+                    const e = body.orbitEccentricity || 0.9; // excentricidad muy alta
+                    const perihelion = (body.perihelion || 100) * zoomLevel; // perihelio (cerca del sol)
+                    
+                    // Calcular el semi-eje menor
+                    const b = a * Math.sqrt(1 - e * e);
+                    
+                    // Desplazar el centro de la elipse (el sol está en un foco, no en el centro)
+                    const c = a * e; // distancia del centro al foco
+                    
+                    // Rotación orbital (argumento del perihelio) en grados convertidos a radianes
+                    const rotationRad = (body.orbitRotation || 0) * Math.PI / 180;
+                    
+                    // Inclinación orbital (simulada con escala en Z)
+                    const inclination = body.orbitInclination || 0;
+                    
+                    // Posición en la órbita elíptica antes de rotar
+                    const ellipseX = Math.cos(angle) * a;
+                    const ellipseY = Math.sin(angle) * b;
+                    
+                    // Aplicar rotación orbital
+                    const rotatedX = ellipseX * Math.cos(rotationRad) - ellipseY * Math.sin(rotationRad);
+                    const rotatedY = ellipseX * Math.sin(rotationRad) + ellipseY * Math.cos(rotationRad);
+                    
+                    // Aplicar inclinación (simulada en 2D con escala)
+                    const inclinedY = rotatedY * Math.cos(inclination);
+                    
+                    // Aplicar el desplazamiento del foco y la rotación al desplazamiento
+                    const focusOffsetX = c * Math.cos(rotationRad);
+                    const focusOffsetY = c * Math.sin(rotationRad);
+                    
+                    x = centerX + rotatedX - focusOffsetX;
+                    y = centerY + inclinedY - focusOffsetY;
+                } else {
+                    x = centerX + Math.cos(angle) * body.distance * zoomLevel;
+                    y = centerY + Math.sin(angle) * body.distance * zoomLevel;
+                }
             }
 
             if (body.distance > 0 && !body.orbitAround) {
-                ctx.strokeStyle = `rgba(255, 255, 255, 0.1)`;
-                ctx.lineWidth = 1;
-                ctx.beginPath();
-                ctx.arc(centerX, centerY, body.distance * zoomLevel, 0, Math.PI * 2);
-                ctx.stroke();
+                ctx.strokeStyle = body.isComet ? 'rgba(135, 206, 235, 0.25)' : 'rgba(255, 255, 255, 0.1)';
+                ctx.lineWidth = body.isComet ? 2 : 1;
+                
+                if (body.isComet) {
+                    ctx.setLineDash([8, 12]);
+                    // Dibujar órbita elíptica muy alargada para cometas con rotación e inclinación
+                    const a = body.distance * zoomLevel;
+                    const e = body.orbitEccentricity || 0.9;
+                    const b = a * Math.sqrt(1 - e * e);
+                    const c = a * e; // desplazamiento del foco
+                    const rotationRad = (body.orbitRotation || 0) * Math.PI / 180;
+                    const inclination = body.orbitInclination || 0;
+                    
+                    ctx.save();
+                    ctx.beginPath();
+                    
+                    // Dibujar la órbita punto por punto aplicando las transformaciones
+                    for (let angle = 0; angle <= Math.PI * 2; angle += 0.05) {
+                        const ellipseX = Math.cos(angle) * a;
+                        const ellipseY = Math.sin(angle) * b;
+                        
+                        // Aplicar rotación
+                        const rotatedX = ellipseX * Math.cos(rotationRad) - ellipseY * Math.sin(rotationRad);
+                        const rotatedY = ellipseX * Math.sin(rotationRad) + ellipseY * Math.cos(rotationRad);
+                        
+                        // Aplicar inclinación
+                        const inclinedY = rotatedY * Math.cos(inclination);
+                        
+                        // Aplicar desplazamiento del foco
+                        const focusOffsetX = c * Math.cos(rotationRad);
+                        const focusOffsetY = c * Math.sin(rotationRad);
+                        
+                        const finalX = centerX + rotatedX - focusOffsetX;
+                        const finalY = centerY + inclinedY - focusOffsetY;
+                        
+                        if (angle === 0) {
+                            ctx.moveTo(finalX, finalY);
+                        } else {
+                            ctx.lineTo(finalX, finalY);
+                        }
+                    }
+                    
+                    ctx.closePath();
+                    ctx.stroke();
+                    
+                    // Dibujar el punto del perihelio (más cerca del sol) - en rojo
+                    const periAngle = Math.PI;
+                    const periEllipseX = Math.cos(periAngle) * a;
+                    const periEllipseY = Math.sin(periAngle) * b;
+                    const periRotatedX = periEllipseX * Math.cos(rotationRad) - periEllipseY * Math.sin(rotationRad);
+                    const periRotatedY = periEllipseX * Math.sin(rotationRad) + periEllipseY * Math.cos(rotationRad);
+                    const periInclinedY = periRotatedY * Math.cos(inclination);
+                    const periFocusOffsetX = c * Math.cos(rotationRad);
+                    const periFocusOffsetY = c * Math.sin(rotationRad);
+                    
+                    ctx.fillStyle = 'rgba(255, 100, 100, 0.5)';
+                    ctx.beginPath();
+                    ctx.arc(
+                        centerX + periRotatedX - periFocusOffsetX,
+                        centerY + periInclinedY - periFocusOffsetY,
+                        4, 0, Math.PI * 2
+                    );
+                    ctx.fill();
+                    
+                    // Dibujar el punto del afelio (más lejos del sol) - en azul
+                    const afeAngle = 0;
+                    const afeEllipseX = Math.cos(afeAngle) * a;
+                    const afeEllipseY = Math.sin(afeAngle) * b;
+                    const afeRotatedX = afeEllipseX * Math.cos(rotationRad) - afeEllipseY * Math.sin(rotationRad);
+                    const afeRotatedY = afeEllipseX * Math.sin(rotationRad) + afeEllipseY * Math.cos(rotationRad);
+                    const afeInclinedY = afeRotatedY * Math.cos(inclination);
+                    const afeFocusOffsetX = c * Math.cos(rotationRad);
+                    const afeFocusOffsetY = c * Math.sin(rotationRad);
+                    
+                    ctx.fillStyle = 'rgba(100, 100, 255, 0.4)';
+                    ctx.beginPath();
+                    ctx.arc(
+                        centerX + afeRotatedX - afeFocusOffsetX,
+                        centerY + afeInclinedY - afeFocusOffsetY,
+                        4, 0, Math.PI * 2
+                    );
+                    ctx.fill();
+                    
+                    ctx.restore();
+                    ctx.setLineDash([]);
+                } else {
+                    ctx.beginPath();
+                    ctx.arc(centerX, centerY, body.distance * zoomLevel, 0, Math.PI * 2);
+                    ctx.stroke();
+                }
             }
 
             const scaledSize = body.size * Math.max(0.5, zoomLevel);
             const scaledGlow = body.glow * Math.max(0.5, zoomLevel);
+
+            // Dibujar cola del cometa
+            if (body.isComet) {
+                const angle = Math.atan2(y - centerY, x - centerX);
+                
+                // Calcular longitud de cola según distancia al sol
+                const distanceToSun = Math.sqrt((x - centerX) ** 2 + (y - centerY) ** 2);
+                const maxDistance = body.distance * zoomLevel;
+                const cometIntensity = Math.max(0.2, 1 - (distanceToSun / maxDistance));
+                const tailLength = scaledSize * 20 * cometIntensity;
+                
+                // Cola principal (polvo) - más ancha
+                const tailGradient = ctx.createLinearGradient(
+                    x, y,
+                    x + Math.cos(angle + Math.PI) * tailLength,
+                    y + Math.sin(angle + Math.PI) * tailLength
+                );
+                tailGradient.addColorStop(0, body.color + Math.floor(170 * cometIntensity).toString(16).padStart(2, '0'));
+                tailGradient.addColorStop(0.5, body.color + Math.floor(68 * cometIntensity).toString(16).padStart(2, '0'));
+                tailGradient.addColorStop(1, body.color + '00');
+                
+                ctx.strokeStyle = tailGradient;
+                ctx.lineWidth = scaledSize * 3 * cometIntensity;
+                ctx.lineCap = 'round';
+                ctx.beginPath();
+                ctx.moveTo(x, y);
+                
+                // Cola curva más realista
+                for (let i = 0; i <= 10; i++) {
+                    const t = i / 10;
+                    const curvature = Math.sin(t * Math.PI) * 0.3;
+                    const distance = tailLength * t;
+                    ctx.lineTo(
+                        x + Math.cos(angle + Math.PI + curvature) * distance,
+                        y + Math.sin(angle + Math.PI + curvature) * distance
+                    );
+                }
+                ctx.stroke();
+                
+                // Cola de iones (más delgada, recta y azulada) - más larga
+                const ionTailGradient = ctx.createLinearGradient(
+                    x, y,
+                    x + Math.cos(angle + Math.PI - 0.15) * tailLength * 1.5,
+                    y + Math.sin(angle + Math.PI - 0.15) * tailLength * 1.5
+                );
+                const ionAlpha = Math.floor(136 * cometIntensity).toString(16).padStart(2, '0');
+                ionTailGradient.addColorStop(0, '#00FFFF' + ionAlpha);
+                ionTailGradient.addColorStop(0.5, '#00FFFF' + Math.floor(51 * cometIntensity).toString(16).padStart(2, '0'));
+                ionTailGradient.addColorStop(1, '#00FFFF00');
+                
+                ctx.strokeStyle = ionTailGradient;
+                ctx.lineWidth = scaledSize * 1.5 * cometIntensity;
+                ctx.beginPath();
+                ctx.moveTo(x, y);
+                ctx.lineTo(
+                    x + Math.cos(angle + Math.PI - 0.15) * tailLength * 1.5,
+                    y + Math.sin(angle + Math.PI - 0.15) * tailLength * 1.5
+                );
+                ctx.stroke();
+                
+                // Segunda cola de iones (efecto más disperso)
+                ctx.strokeStyle = ionTailGradient;
+                ctx.lineWidth = scaledSize * 0.8 * cometIntensity;
+                ctx.beginPath();
+                ctx.moveTo(x, y);
+                ctx.lineTo(
+                    x + Math.cos(angle + Math.PI + 0.1) * tailLength * 1.3,
+                    y + Math.sin(angle + Math.PI + 0.1) * tailLength * 1.3
+                );
+                ctx.stroke();
+            }
 
             const glowGradient = ctx.createRadialGradient(x, y, 0, x, y, scaledGlow);
             glowGradient.addColorStop(0, body.color + 'AA');
@@ -639,6 +1070,36 @@
             ctx.arc(x, y, scaledSize, 0, Math.PI * 2);
             ctx.fill();
 
+            // Núcleo del cometa (más brillante y con coma)
+            if (body.isComet) {
+                // Calcular brillo según distancia al sol
+                const distanceToSun = Math.sqrt((x - centerX) ** 2 + (y - centerY) ** 2);
+                const maxDistance = body.distance * zoomLevel;
+                const brightness = Math.max(0.3, 1 - (distanceToSun / maxDistance));
+                
+                // Coma (nube brillante alrededor del núcleo)
+                const comaGradient = ctx.createRadialGradient(x, y, 0, x, y, scaledSize * 4 * brightness);
+                comaGradient.addColorStop(0, `rgba(255, 255, 255, ${0.6 * brightness})`);
+                comaGradient.addColorStop(0.5, `rgba(200, 240, 255, ${0.3 * brightness})`);
+                comaGradient.addColorStop(1, 'rgba(135, 206, 235, 0)');
+                ctx.fillStyle = comaGradient;
+                ctx.beginPath();
+                ctx.arc(x, y, scaledSize * 4 * brightness, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Núcleo brillante
+                ctx.fillStyle = `rgba(255, 255, 255, ${brightness})`;
+                ctx.beginPath();
+                ctx.arc(x, y, scaledSize * 0.6, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Punto central ultra brillante
+                ctx.fillStyle = '#FFFFFF';
+                ctx.beginPath();
+                ctx.arc(x, y, scaledSize * 0.3, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
             if (body.name === 'Sol') {
                 ctx.strokeStyle = '#FFE5B4';
                 ctx.lineWidth = 2;
@@ -664,12 +1125,27 @@
                 ctx.fill();
             }
 
-            if (zoomLevel > 0.8 && scaledSize > 3) {
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
-                ctx.font = `${Math.max(10, scaledSize)}px Arial`;
+            if ((zoomLevel > 0.8 && scaledSize > 3) || body.isComet) {
+                ctx.fillStyle = body.isComet ? 'rgba(135, 206, 235, 1)' : 'rgba(255, 255, 255, 0.9)';
+                ctx.font = `bold ${Math.max(11, scaledSize * 1.2)}px Arial`;
                 ctx.textAlign = 'center';
-                ctx.fillText(body.name, x, y + scaledSize + 15);
+                
+                // Sombra para mejor legibilidad
+                ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
+                ctx.shadowBlur = 8;
+                ctx.shadowOffsetX = 2;
+                ctx.shadowOffsetY = 2;
+                
+                ctx.fillText(body.name, x, y + scaledSize + 18);
+                
+                // Resetear sombra
+                ctx.shadowColor = 'transparent';
+                ctx.shadowBlur = 0;
+                ctx.shadowOffsetX = 0;
+                ctx.shadowOffsetY = 0;
             }
+            
+            return { x, y, size: scaledSize };
         }
 
         function lightenColor(color, percent) {
@@ -679,6 +1155,8 @@
             const b = Math.min(255, (num & 255) + percent);
             return `rgb(${r}, ${g}, ${b})`;
         }
+
+        let sunPosition = { x: 0, y: 0, size: 0 };
 
         function animate() {
             ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
@@ -691,7 +1169,7 @@
                 drawVortex();
             }
             
-            if (dimensionMode === 0 || dimensionMode === 2) {
+            if ((dimensionMode === 0 || dimensionMode === 2) && photonsActive) {
                 particles.forEach(particle => {
                     particle.update();
                     particle.draw();
@@ -699,7 +1177,10 @@
             }
             
             celestialBodies.forEach(body => {
-                drawCelestialBody(body);
+                const pos = drawCelestialBody(body);
+                if (body.name === 'Sol') {
+                    sunPosition = pos;
+                }
             });
             
             time++;
@@ -710,14 +1191,40 @@
 
         window.addEventListener('resize', updateCanvasSize);
 
+        let lastTouchDistance = 0;
+        
+        canvas.addEventListener('touchstart', (e) => {
+            if (e.touches.length === 2) {
+                const dx = e.touches[0].clientX - e.touches[1].clientX;
+                const dy = e.touches[0].clientY - e.touches[1].clientY;
+                lastTouchDistance = Math.sqrt(dx * dx + dy * dy);
+            }
+        }, { passive: true });
+        
+        canvas.addEventListener('touchmove', (e) => {
+            if (e.touches.length === 2) {
+                e.preventDefault();
+                const dx = e.touches[0].clientX - e.touches[1].clientX;
+                const dy = e.touches[0].clientY - e.touches[1].clientY;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                
+                if (lastTouchDistance > 0) {
+                    const delta = distance > lastTouchDistance ? 1.02 : 0.98;
+                    zoomLevel = Math.max(0.3, Math.min(2, zoomLevel * delta));
+                }
+                
+                lastTouchDistance = distance;
+            }
+        });
+
         canvas.addEventListener('wheel', (e) => {
             e.preventDefault();
             const delta = e.deltaY > 0 ? 0.9 : 1.1;
             zoomLevel = Math.max(0.3, Math.min(2, zoomLevel * delta));
-        });
+        }, { passive: false });
 
         canvas.addEventListener('mousemove', (e) => {
-            if (dimensionMode !== 1) {
+            if ((dimensionMode === 0 || dimensionMode === 2) && photonsActive) {
                 const rect = canvas.getBoundingClientRect();
                 const mouseX = e.clientX - rect.left;
                 const mouseY = e.clientY - rect.top;
@@ -738,12 +1245,56 @@
             }
         });
 
-        canvas.addEventListener('click', () => {
-            dimensionMode = (dimensionMode + 1) % 3;
-            const modes = ['Portal + Sistema Solar', 'Solo Sistema Solar', 'Dimensión Completa'];
-            document.querySelector('.info').textContent = `Modo: ${modes[dimensionMode]}`;
+        function checkSunClick(clickX, clickY) {
+            const dx = clickX - sunPosition.x;
+            const dy = clickY - sunPosition.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            return distance <= sunPosition.size + 20;
+        }
+
+        canvas.addEventListener('click', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const clickX = e.clientX - rect.left;
+            const clickY = e.clientY - rect.top;
+            
+            if (checkSunClick(clickX, clickY)) {
+                photonsActive = !photonsActive;
+                const info = document.querySelector('.info');
+                info.textContent = `Fotones: ${photonsActive ? 'Activados' : 'Desactivados'}`;
+                
+                if (!photonsActive) {
+                    particles.length = particleCount;
+                }
+            } else {
+                dimensionMode = (dimensionMode + 1) % 3;
+                const modes = ['Portal + Sistema Solar', 'Solo Sistema Solar', 'Dimensión Completa'];
+                document.querySelector('.info').textContent = `Modo: ${modes[dimensionMode]}`;
+            }
+        });
+
+        canvas.addEventListener('touchend', (e) => {
+            if (e.changedTouches.length === 1) {
+                const rect = canvas.getBoundingClientRect();
+                const clickX = e.changedTouches[0].clientX - rect.left;
+                const clickY = e.changedTouches[0].clientY - rect.top;
+                
+                if (checkSunClick(clickX, clickY)) {
+                    photonsActive = !photonsActive;
+                    const info = document.querySelector('.info');
+                    info.textContent = `Fotones: ${photonsActive ? 'Activados' : 'Desactivados'}`;
+                    
+                    if (!photonsActive) {
+                        particles.length = particleCount;
+                    }
+                } else {
+                    dimensionMode = (dimensionMode + 1) % 3;
+                    const modes = ['Portal + Sistema Solar', 'Solo Sistema Solar', 'Dimensión Completa'];
+                    document.querySelector('.info').textContent = `Modo: ${modes[dimensionMode]}`;
+                }
+            }
         });
     </script>
 </body>
 </html>
+
 
